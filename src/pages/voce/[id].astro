@@ -57,6 +57,11 @@ const base = import.meta.env.BASE_URL;
   figure { margin: 0 0 1rem; padding-left: 1rem; border-left: 3px solid var(--accento); }
   blockquote { margin: 0; font-style: italic; font-size: 1.125rem; }
   figcaption { color: var(--tenue); }
+  article :global(h3) { font-size: 1.125rem; margin: 1.5rem 0 .5rem; }
+  article :global(table) { border-collapse: collapse; table-layout: fixed; width: 100%; max-width: 28rem; }
+  article :global(th) { text-align: left; font: 600 .75rem var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--tenue); }
+  article :global(th), article :global(td) { padding: .35rem .75rem .35rem 0; border-bottom: 1px solid var(--riga); }
+  article :global(td:first-child) { font-style: italic; }
   .fonte { margin-top: 2rem; color: var(--tenue); font: .875rem var(--sans); }
   .scorri { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--riga); font: .9375rem var(--sans); }
   .scorri a { text-decoration: none; }
