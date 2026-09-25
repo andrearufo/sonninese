@@ -1,0 +1,66 @@
+---
+interface Props { title?: string; description?: string }
+const { title, description = 'Vocabolario del dialetto sonninese: parole, locuzioni e modi di dire di Sonnino (LT).' } = Astro.props;
+const home = import.meta.env.BASE_URL;
+---
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ? `${title} · Sonninese` : 'Sonninese · Vocabolario del dialetto di Sonnino'}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={`${home}favicon.svg`} />
+  </head>
+  <body>
+    <header>
+      <a class="marchio" href={home}>Sonninese</a>
+      <span>Vocabolario del dialetto di Sonnino</span>
+    </header>
+    <main><slot /></main>
+    <footer>
+      Raccolta aperta, sorgente su <a href="https://github.com/andrearufo/sonninese">GitHub</a>.
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --carta: #f7f2e9;
+    --inchiostro: #2a241d;
+    --tenue: #75695a;
+    --riga: #e2d8c7;
+    --accento: #a4442b;
+    --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --carta: #1b1815;
+      --inchiostro: #ece4d6;
+      --tenue: #a39684;
+      --riga: #3a332b;
+      --accento: #e0835f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0 auto;
+    max-width: 44rem;
+    padding: 0 1rem;
+    background: var(--carta);
+    color: var(--inchiostro);
+    font: 1.0625rem/1.6 var(--serif);
+  }
+  a { color: var(--accento); }
+  header {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem 1rem;
+    padding: 2rem 0 1.5rem; border-bottom: 1px solid var(--riga);
+  }
+  header span { color: var(--tenue); font: .875rem var(--sans); }
+  .marchio { font-size: 1.75rem; font-weight: 700; text-decoration: none; color: var(--inchiostro); letter-spacing: -.01em; }
+  main { padding: 2rem 0 3rem; }
+  footer { border-top: 1px solid var(--riga); padding: 1.5rem 0 3rem; color: var(--tenue); font: .875rem var(--sans); }
+  .tipo { color: var(--tenue); font-style: italic; }
+</style>

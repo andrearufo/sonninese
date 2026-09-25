@@ -1,0 +1,63 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { voci } from '../../voci';
+
+export async function getStaticPaths() {
+  const tutte = await voci();
+  return tutte.map((voce, i) => ({ params: { id: voce.id }, props: { voce, prec: tutte[i - 1], succ: tutte[i + 1] } }));
+}
+
+const { voce, prec, succ } = Astro.props;
+const { lemma, tipo, significato, esempi, fonte } = voce.data;
+const { Content } = await render(voce);
+const base = import.meta.env.BASE_URL;
+---
+<Base title={lemma} description={`${lemma} (${tipo.join(', ')}): ${significato}. Dialetto sonninese.`}>
+  <a class="indietro" href={base}>← Tutte le voci</a>
+  <article>
+    <h1>{lemma}</h1>
+    <p class="tipo">{tipo.join(', ')}</p>
+    <p class="significato">{significato}</p>
+
+    {esempi.length > 0 && (
+      <section>
+        <h2>Esempi</h2>
+        {esempi.map((e) => (
+          <figure>
+            <blockquote>{e.dialetto}</blockquote>
+            <figcaption>{e.italiano}</figcaption>
+          </figure>
+        ))}
+      </section>
+    )}
+
+    {voce.body?.trim() && (
+      <section>
+        <h2>Note</h2>
+        <Content />
+      </section>
+    )}
+
+    {fonte && <p class="fonte">Fonte: {fonte}</p>}
+  </article>
+
+  <nav class="scorri">
+    {prec ? <a href={`${base}voce/${prec.id}/`}>← {prec.data.lemma}</a> : <span />}
+    {succ && <a href={`${base}voce/${succ.id}/`}>{succ.data.lemma} →</a>}
+  </nav>
+</Base>
+
+<style>
+  .indietro { font: .875rem var(--sans); text-decoration: none; }
+  h1 { font-size: clamp(2.25rem, 8vw, 3.25rem); line-height: 1.1; margin: 1.5rem 0 .25rem; letter-spacing: -.02em; }
+  .tipo { margin: 0 0 1rem; }
+  .significato { font-size: 1.375rem; margin: 0 0 2rem; }
+  h2 { font: 600 .75rem var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--tenue); margin: 2rem 0 .75rem; }
+  figure { margin: 0 0 1rem; padding-left: 1rem; border-left: 3px solid var(--accento); }
+  blockquote { margin: 0; font-style: italic; font-size: 1.125rem; }
+  figcaption { color: var(--tenue); }
+  .fonte { margin-top: 2rem; color: var(--tenue); font: .875rem var(--sans); }
+  .scorri { display: flex; justify-content: space-between; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--riga); font: .9375rem var(--sans); }
+  .scorri a { text-decoration: none; }
+</style>
