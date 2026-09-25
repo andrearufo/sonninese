@@ -12,11 +12,12 @@ const { voce, prec, succ } = Astro.props;
 const { lemma, tipo, significato, esempi, fonte } = voce.data;
 const { Content } = await render(voce);
 const base = import.meta.env.BASE_URL;
+const icona = '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
 ---
 <Base title={lemma} description={`${lemma} (${tipo.join(', ')}): ${significato}. Dialetto sonninese.`}>
   <a class="indietro" href={base}>← Tutte le voci</a>
   <article>
-    <h1>{lemma}</h1>
+    <h1>{lemma} <button class="parla" data-testo={lemma} aria-label={`Ascolta «${lemma}»`} hidden set:html={icona} /></h1>
     <p class="tipo">{tipo.join(', ')}</p>
     <p class="significato">{significato}</p>
 
@@ -25,7 +26,7 @@ const base = import.meta.env.BASE_URL;
         <h2>Esempi</h2>
         {esempi.map((e) => (
           <figure>
-            <blockquote>{e.dialetto}</blockquote>
+            <blockquote>{e.dialetto} <button class="parla" data-testo={e.dialetto} aria-label="Ascolta l'esempio" hidden set:html={icona} /></blockquote>
             <figcaption>{e.italiano}</figcaption>
           </figure>
         ))}
@@ -48,10 +49,33 @@ const base = import.meta.env.BASE_URL;
   </nav>
 </Base>
 
+<script>
+  // Sintesi vocale del sistema (iOS, Android, desktop): voce italiana, la più vicina al dialetto
+  if ('speechSynthesis' in window) {
+    for (const b of document.querySelectorAll<HTMLButtonElement>('.parla')) {
+      b.hidden = false;
+      b.addEventListener('click', () => {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(b.dataset.testo);
+        u.lang = 'it-IT';
+        u.rate = 0.85;
+        u.voice = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-') === 'it-IT') ?? null;
+        speechSynthesis.speak(u);
+      });
+    }
+  }
+</script>
+
 <style>
   .indietro { font: .875rem var(--sans); text-decoration: none; }
   h1 { font-size: clamp(2.25rem, 8vw, 3.25rem); line-height: 1.1; margin: 1.5rem 0 .25rem; letter-spacing: -.02em; }
   .tipo { margin: 0 0 1rem; }
+  .parla {
+    font-size: .5em; vertical-align: middle; padding: .35em; line-height: 0;
+    color: var(--accento); background: transparent; border: 1px solid var(--riga); border-radius: 50%; cursor: pointer;
+  }
+  .parla:hover { background: var(--riga); }
+  blockquote .parla { font-size: .9rem; border: 0; padding: .2em; }
   .significato { font-size: 1.375rem; margin: 0 0 2rem; }
   h2 { font: 600 .75rem var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--tenue); margin: 2rem 0 .75rem; }
   figure { margin: 0 0 1rem; padding-left: 1rem; border-left: 3px solid var(--accento); }
